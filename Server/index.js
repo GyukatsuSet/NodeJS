@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-// 몽고 DB 설정
+// 몽고 DB 설정y
 mongoose.connect(config.mongoURI, {
     useNewUrlParser: true, 
     useUnifiedTopology: true, 
