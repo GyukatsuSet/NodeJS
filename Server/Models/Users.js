@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRonds = 10; // salt 글자수
+const jwt = require('jsonwebtoken');
 
 const Schema = mongoose.Schema
 
@@ -60,6 +61,31 @@ UserSchema.pre('save', function(next){
     }
 });
 //moongoose에서 가져오는 매소드
+
+UserSchema.methods.comparePassword = function(plainPassword, cb){
+
+    // planpassword
+    bcrypt.compare(plainPassword, this.password, function(err, isMatch){
+        if(err) return cb(err); // false
+        cb(null, isMatch); // true
+    });
+
+}
+
+UserSchema.methods.generateToken = function (cb){
+
+    var user = this;
+    //jsonwebtoken을 이용해서 token을 생성
+    
+    var token = jwt.sign(user._id.toHexString(), 'secretToken');
+
+    user.token = token;
+    user.save(function(err, user){
+        if(err) return cb(err);
+        cb(null, user);
+    });
+
+}
 
 const User = mongoose.model('User', UserSchema);
 
