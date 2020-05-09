@@ -52,10 +52,12 @@ UserSchema.pre('save', function(next){
                 console.log("Your password has been locked");
                 next();
                 // hash : 비밀번호를 암호화 시키기
+                 //next() : 설정을 다한다음에 mongoDB로 보내는 곳으로 전송
             });
         });
+    }else{
+        next();
     }
-    //next() : 설정을 다한다음에 mongoDB로 보내는 곳으로 전송
 });
 //moongoose에서 가져오는 매소드
 
