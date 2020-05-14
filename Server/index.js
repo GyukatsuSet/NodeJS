@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const {User} = require("./Models/Users");
+const {auth} = require("./middleware/auth");
 const config = require('./config/key');
 
 app.use(bodyParser.json());
@@ -26,10 +27,11 @@ mongoose.connect(config.mongoURI, {
 }).then(() => console.log("MongoDB connected..."))
   .catch(err => console.log(Error))
 
-app.get('/', (req, res) => res.send('규카츠 먹고싶다')); // 인사하는 코드
+  app.get('/', (req, res) => res.send('규카츠 먹고싶다')); // 입력
+  app.get('/login/', (req, res) => res.send('호두과자 먹고싶다')); // 입력
 
 
-app.post('/register', (req, res) => {
+app.post('api/users/register', (req, res) => {
   // 회원가입을 하면서 필요한 정보들을 clinet에서 가져오면
   // 데이터베이스에 넣어주는 코드
 
@@ -47,7 +49,7 @@ app.post('/register', (req, res) => {
 });
 
 
-app.post('/login', (req, res) => {
+app.post('api/users/login', (req, res) => {
 // 요청된 이메일을 데이터베이스에 있는지 찾기
   User.findOne({email:req.body.email }, (err, user) =>{
     if(!user){
@@ -79,5 +81,25 @@ app.post('/login', (req, res) => {
     });
   });
 });
+
+// role 0 : 일반유저
+// role 1 : 관리자
+// role 2 : 특정 부서 관리자
+
+app.post('/api/users/auth/', auth , (req, res) => {
+  res.status(200).json({
+    _id : req.user._id,
+    isAdmin : req.user.role === 0 ? false : true,
+    isAuth : true,
+    email : req.user.email,
+    name : req.user.name,
+    lastname : req.user.lastname,
+    role : req.user.role,
+    image : req.user.image
+  });
+});
+
+// api/users : user에 관련된 api를 만들 때 넣으면 좋다(나중에 Express에서 제공되는 Router를 쓰면서 정리를 할 때 도움이 된다)
+
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
